@@ -75,27 +75,46 @@ Carrega o corpus, faz chunking (500 caracteres, overlap 50), gera embeddings loc
 ### 5. Benchmark comparativo (`query_benchmark.py`)
 Roda as mesmas 3 perguntas contra o mesmo índice vetorial, alternando entre `ChatVertexAI` e `ChatGoogleGenerativeAI`, com retry simples (3 tentativas, 10s de espera) para lidar com instabilidade momentânea das APIs.
 
-## Resultados (primeira execução)
+## Resultados
 
-| Provider | Resultado |
-|---|---|
-| Vertex AI (Gemini 2.5 Flash) | 3/3 perguntas respondidas corretamente, citando os artigos certos do corpus |
-| Gemini API (Gemini 2.5 Flash) | Bloqueado por `429 RESOURCE_EXHAUSTED` — quota do free tier esgotada, depois "prepayment credits are depleted" |
+### Comparação qualitativa (respostas)
 
-### Achado relevante
+| Pergunta | Vertex AI | Gemini API |
+|---|---|---|
+| Prazo de análise | Correto (90 dias) | Correto (90 dias) |
+| Documentação incompleta | Correto (30 dias) | Correto (idêntico) |
+| Validade do registro | Correto (5 anos) | Correto (5 anos) |
+
+Para o mesmo modelo (`gemini-2.5-flash`), a qualidade da resposta não muda entre Vertex AI e Gemini API — a diferença real está na camada de acesso e billing, não na geração em si.
+
+### Avaliação RAGAS
+
+| Métrica | Vertex AI (Gemini 2.5 Flash) | Gemini API (Gemini 2.5 Flash) |
+|---|---|---|
+| Faithfulness | 1.00 | Não concluído (ver achado abaixo) |
+| Answer relevancy | 0.85 | Não concluído |
+| Context precision | 1.00 | Não concluído |
+
+### Achados técnicos
+
+**1. Mudança de billing da Gemini API (março/2026)**
 Desde março de 2026, o uso da Gemini API deixou de ser coberto pelo crédito de $300 do Google Cloud Free Trial — exige saldo prepago próprio no AI Studio. Isso muda a forma como "free tier" deve ser entendido ao planejar um projeto de RAG com orçamento zero: o caminho via Google Cloud/Vertex AI (billing corporativo) se mostrou mais estável e imediato do que o caminho via Gemini API standalone.
+
+**2. Incompatibilidade RAGAS + Gemini API + Windows**
+A avaliação RAGAS rodou de ponta a ponta sem problemas usando Vertex AI como gerador e como juiz. Ao tentar avaliar o lado Gemini API — mesmo isolando-o em um script próprio, sem o Vertex AI no mesmo processo — o processo consistentemente travou (`RuntimeError: Event loop is closed`, `TimeoutError`) antes de completar todos os jobs de avaliação, mesmo após: atualizar/fixar versões do RAGAS, corrigir um import quebrado na própria biblioteca (bug conhecido, ver [issue #2745](https://github.com/vibrantlabsai/ragas/issues/2745)), forçar a política de event loop `WindowsSelectorEventLoopPolicy`, e reduzir a concorrência (`max_workers=1`). O padrão sugere uma incompatibilidade de baixo nível entre o cliente assíncrono `google-genai`/gRPC e o event loop do RAGAS no Windows — não um erro de configuração do projeto. Ficou documentado aqui como achado, sem bloquear a conclusão do benchmark.
 
 ## Status atual
 
 - [x] Pipeline RAG funcional ponta a ponta (corpus → chunking → embeddings → ChromaDB → geração)
 - [x] Lado Vertex AI validado com 100% de acerto nas perguntas de teste
-- [ ] Lado Gemini API pendente de saldo prepago para completar a comparação
-- [ ] Métricas RAGAS (faithfulness, answer relevancy, context precision) ainda não implementadas
+- [x] Lado Gemini API validado qualitativamente (respostas corretas, comparação manual)
+- [x] Avaliação RAGAS completa para o lado Vertex AI
+- [x] Achado documentado: incompatibilidade RAGAS + Gemini API + Windows
+- [ ] Avaliação RAGAS para o lado Gemini API (bloqueada pela incompatibilidade acima; possível solução futura: rodar em ambiente Linux/WSL)
 - [ ] Corpus de teste ainda é sintético e pequeno (1 documento, 6 chunks) — expandir para um corpus mais representativo
 
 ## Próximos passos
 
-1. Carregar saldo prepago mínimo na Gemini API ou comparar modelos dentro do próprio Vertex AI (ex: `gemini-2.5-flash` vs `gemini-2.5-flash-lite`) enquanto isso não é resolvido.
-2. Implementar avaliação RAGAS sobre as respostas dos dois lados.
-3. Gerar tabela e gráfico comparativo final (custo, latência, qualidade da resposta).
-4. Expandir o corpus sintético para mais documentos, aproximando do cenário de domínio regulado (ANVISA/SNCR).
+1. Testar a avaliação RAGAS do lado Gemini API em WSL ou Linux, onde o event loop padrão não deve ter o mesmo conflito.
+2. Expandir o corpus sintético para mais documentos, aproximando do cenário de domínio regulado (ANVISA/SNCR).
+3. Escrever e publicar o post no LinkedIn com os dois achados (billing e incompatibilidade técnica).
