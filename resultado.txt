@@ -1,0 +1,30 @@
+C:\Users\w11w1\Documents\rag-benchmark\query_benchmark.py:2: DeprecationWarning: `langchain-community` is being sunset and is no longer actively maintained. See https://github.com/langchain-ai/langchain-community/issues/674 for details and migration guidance toward standalone integration packages.
+  from langchain_community.vectorstores import Chroma
+C:\Users\w11w1\Documents\rag-benchmark\query_benchmark.py:7: LangChainDeprecationWarning: The class `HuggingFaceEmbeddings` was deprecated in LangChain 0.2.2 and will be removed in 1.0. An updated version of the class exists in the `langchain-huggingface package and should be used instead. To use it run `pip install -U `langchain-huggingface` and import as `from `langchain_huggingface import HuggingFaceEmbeddings``.
+  embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 4079.37it/s]
+C:\Users\w11w1\Documents\rag-benchmark\query_benchmark.py:8: LangChainDeprecationWarning: The class `Chroma` was deprecated in LangChain 0.2.9 and will be removed in 1.0. An updated version of the class exists in the `langchain-chroma package and should be used instead. To use it run `pip install -U `langchain-chroma` and import as `from `langchain_chroma import Chroma``.
+  db = Chroma(persist_directory="./chroma_db", embedding_function=embeddings)
+C:\Users\w11w1\Documents\rag-benchmark\query_benchmark.py:33: DeprecationWarning: Use [`ChatGoogleGenerativeAI`][langchain_google_genai.ChatGoogleGenerativeAI] instead.
+  llm_vertex = ChatVertexAI(
+C:\Users\w11w1\Documents\rag-benchmark\query_benchmark.py:33: LangChainDeprecationWarning: The class `ChatVertexAI` was deprecated in LangChain 3.2.0 and will be removed in 4.0.0. An updated version of the class exists in the `langchain-google-genai package and should be used instead. To use it run `pip install -U `langchain-google-genai` and import as `from `langchain_google_genai import ChatGoogleGenerativeAI``.
+  llm_vertex = ChatVertexAI(
+
+=== Pergunta: Qual o prazo para a Agência analisar o processo de registro? ===
+[Vertex AI] O prazo para análise do processo pela Agência é de até 90 (noventa) dias corridos.
+  (tentativa 1 falhou, aguardando 10s...)
+  (tentativa 2 falhou, aguardando 10s...)
+[Gemini API] [ERRO: Error calling model 'gemini-2.5-flash' (RESOURCE_EXHAUSTED): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]
+
+=== Pergunta: O que acontece se a documentação estiver incompleta? ===
+[Vertex AI] Caso a documentação esteja incompleta, a Agência notificará o requerente, que terá o prazo de 30 (trinta) dias para complementação, sob pena de arquivamento do processo.
+  (tentativa 1 falhou, aguardando 10s...)
+  (tentativa 2 falhou, aguardando 10s...)
+[Gemini API] [ERRO: Error calling model 'gemini-2.5-flash' (RESOURCE_EXHAUSTED): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]
+
+=== Pergunta: Qual a validade do registro concedido? ===
+[Vertex AI] A validade do registro concedido é de 5 (cinco) anos.
+  (tentativa 1 falhou, aguardando 10s...)
+  (tentativa 2 falhou, aguardando 10s...)
+[Gemini API] [ERRO: Error calling model 'gemini-2.5-flash' (RESOURCE_EXHAUSTED): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]
